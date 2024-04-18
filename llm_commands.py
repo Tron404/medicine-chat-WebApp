@@ -7,12 +7,15 @@ headers = {
 
 import numpy as np
 import logging
+import os
+
+url = os.environ["API_URL"]
 
 logger = logging.getLogger("events")
 logging.basicConfig(filename="event_log.log", encoding="utf-8", level=logging.INFO, filemode="w")
-def query(state, payload):
+def query(payload):
     # {'error': 'Input validation error: `inputs` tokens + `max_new_tokens` must be <= 4096. Given: 191 `inputs` tokens and 4095 `max_new_tokens`', 'error_type': 'validation'}
-    response = requests.post(state.URL, headers=headers, json=payload)
+    response = requests.post(url, headers=headers, json=payload)
     response = response.json()
     print(response)
     if type(response) == dict and "error_type" in response.keys():
@@ -35,10 +38,10 @@ def mock_query(payload):
             logger.error("Context too big")
             print(type(e).__name__)
 
-def request(state, prompt: str) -> str:
+def request(prompt: str) -> str:
     our_system_prompt = "\nYou are a helpful, respectful and honest assistant. Always answer as helpfully as possible, while being safe. Your answers should not include any harmful, unethical, racist, sexist, toxic, dangerous, or illegal content. Please ensure that your responses are socially unbiased and positive in nature.\n\nIf a question does not make any sense, or is not factually coherent, explain why instead of answering something not correct. If you don't know the answer to a question, please don't share false information. Be as concise and direct in your answers, and try to limit the use of filler words.\n" # Please do NOT change this
     prompt = f"<s>[INST] <<SYS>>{our_system_prompt}<</SYS>>\n\n{prompt} [/INST]"
-    output = query(state,
+    output = query(
         {
             "inputs": prompt,
             "parameters": {
@@ -76,7 +79,7 @@ def send_request(state) -> str:
         context = [f"{role_to_input[message['role']]}: {message['content']}\n" for message in state.message_history[-(context_limit*2-1):]]
         context = "\n".join(context)
         context += "AI: "
-        answer = request(state, context)
+        answer = request(context)
         if answer:
             answer = answer.replace("\n", "")
             state.message_fail = False
