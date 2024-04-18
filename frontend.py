@@ -16,7 +16,6 @@ for message in st.session_state["message_history"]:
     st.chat_message(message["role"]).write(message["content"])
 
 user_input = st.chat_input("Write smth")
-url = st.text_input("Put endpoint URL (WIP for now)")
 if user_input:
     st.session_state.message_history.append({"role": "user", "content": user_input})
     st.chat_message("user").write(user_input)

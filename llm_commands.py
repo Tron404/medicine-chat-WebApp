@@ -8,8 +8,10 @@ headers = {
 import numpy as np
 import logging
 import os
+import streamlit as st
 
-url = os.environ["API_URL"]
+# url = os.environ["API_URL"]
+url = st.secrets["API_URL"]
 
 logger = logging.getLogger("events")
 logging.basicConfig(filename="event_log.log", encoding="utf-8", level=logging.INFO, filemode="w")
